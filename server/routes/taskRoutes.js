@@ -19,14 +19,19 @@ const taskValidation = [
   body("dueDate").optional().isISO8601().withMessage("Invalid date format"),
 ];
 
+// Admin routes — must be before /:id to avoid param conflicts
 router.get("/admin/all", adminOnly, getAllTasks);
 router.post("/admin/create-for-user", adminOnly, taskValidation, validate, createTaskForUser);
 router.put("/admin/:id", adminOnly, taskValidation, validate, adminUpdateTask);
 router.delete("/admin/:id", adminOnly, adminDeleteTask);
 
+// User task routes
 router.route("/").get(getTasks).post(taskValidation, validate, createTask);
-router.route("/:id").get(getTask).put(taskValidation, validate, updateTask).delete(deleteTask);
 
+// Comments nested route — before /:id
 router.use("/:taskId/comments", commentRoutes);
+
+// Dynamic param route — must be last
+router.route("/:id").get(getTask).put(taskValidation, validate, updateTask).delete(deleteTask);
 
 export default router;
