@@ -52,9 +52,9 @@ const Dashboard = () => {
     }
   };
 
-  const todoCount = tasks.filter((t) => t.status === "todo").length;
-  const inProgressCount = tasks.filter((t) => t.status === "in-progress").length;
-  const doneCount = tasks.filter((t) => t.status === "done").length;
+  const todoCount = (tasks ?? []).filter((t) => t.status === "todo").length;
+  const inProgressCount = (tasks ?? []).filter((t) => t.status === "in-progress").length;
+  const doneCount = (tasks ?? []).filter((t) => t.status === "done").length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-12">

@@ -73,7 +73,7 @@ const Navbar = () => {
 
               <div className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-medium text-gray-700">{user.name}</span>
                 <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium capitalize">

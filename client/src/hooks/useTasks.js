@@ -12,8 +12,8 @@ const useTasks = (filters) => {
     setError(null);
     try {
       const { data } = await api.get("/tasks", { params: filters });
-      setTasks(data.tasks);
-      setPagination(data.pagination);
+      setTasks(data.tasks ?? []);
+      setPagination(data.pagination ?? {});
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch tasks");
     } finally {
