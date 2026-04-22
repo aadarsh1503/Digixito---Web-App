@@ -8,9 +8,10 @@ export default defineConfig({
     outDir: 'build',
 
   },
-  server: {
-    proxy: {
-      "/api": "http://localhost:5000",
-    },
-  },
+  // server.proxy is for local dev only — disabled for production builds
+  // server: {
+  //   proxy: {
+  //     "/api": "http://localhost:5000",
+  //   },
+  // },
 })
