@@ -40,11 +40,84 @@ npm run dev
 ```
 
 ### Create Admin Account
+
+A seed script is provided for **development/testing purposes only**.
+
+Set the admin credentials in your `.env` before running:
+
+```
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_secure_password
+ADMIN_NAME=Admin
+```
+
 ```bash
 cd server
 node scripts/createAdmin.js
 ```
-Admin credentials: `aadi@gmail.com` / `123456`
+
+> In a production environment, admin accounts should be provisioned through a secure internal process — not via a publicly documented script. Credentials are intentionally not hardcoded here. If you are an evaluator reviewing this project and need test credentials, please request them directly — they will be shared privately.
+
+### Environment Variables
+
+**Server** — copy `server/.env.example` to `server/.env`:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://your-frontend.vercel.app
+ADMIN_NAME=Admin
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_secure_password
+```
+
+**Client** — copy `client/.env.example` to `client/.env`:
+
+```
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+For local development, set `VITE_API_URL=http://localhost:5000/api` in `client/.env`.
+
+---
+
+## Deployment
+
+### Backend — Render
+1. Push the `server/` folder to a Git repo
+2. Create a new Web Service on [Render](https://render.com)
+3. Set build command: `npm install`, start command: `npm start`
+4. Add environment variables:
+   - `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`
+   - `CLIENT_URL` — set to your Vercel frontend URL (e.g. `https://your-app.vercel.app`)
+
+### Frontend — Vercel
+1. Push the `client/` folder to a Git repo
+2. Create a new project on [Vercel](https://vercel.com)
+3. Add environment variable:
+   - `VITE_API_URL` — set to your Render backend URL (e.g. `https://your-api.onrender.com/api`)
+
+### CORS
+The backend reads `CLIENT_URL` from env to configure CORS. Without it, cross-origin requests from the deployed frontend will be blocked. The Vite dev proxy (`server.proxy`) is commented out in `vite.config.js` — it is only needed for local development.
+
+### Why VITE_API_URL is Required in Production
+
+In local development, Vite's `server.proxy` intercepts any request to `/api/*` and forwards it to `http://localhost:5000`. This means relative URLs like `/api/auth/login` work without specifying a full origin.
+
+In production (Vercel + Render), there is no proxy layer — the frontend is a static bundle served from Vercel's CDN and the backend runs as a separate service on Render. A relative URL like `/api/auth/login` would resolve to `https://your-frontend.vercel.app/api/auth/login`, which doesn't exist and returns a 404.
+
+To solve this, `VITE_API_URL` is injected at build time by Vite and used as the `baseURL` in the Axios instance:
+
+```js
+// client/src/api/axios.baseURL
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "/api",
+});
+```
+
+Every API call across the app (`api.get(...)`, `api.post(...)`, etc.) automatically prepends this base URL — so setting `VITE_API_URL=https://your-api.onrender.com/api` on Vercel is the only change needed to point all requests at the correct backend origin.
 
 ### Environment Variables
 
